@@ -14,6 +14,10 @@ import { catchError, Observable, of, tap } from "rxjs";
 
     public readonly products = this._products.asReadonly();
 
+    private readonly _productsInCart = signal<Product[]>([]);
+
+    public readonly productsInCart = this._productsInCart.asReadonly();
+
     public get(): Observable<Product[]> {
         return this.http.get<Product[]>(this.path).pipe(
             catchError((error) => {
@@ -50,5 +54,15 @@ import { catchError, Observable, of, tap } from "rxjs";
             }),
             tap(() => this._products.update(products => products.filter(product => product.id !== productId))),
         );
+    }
+
+    public addProductIntoCart(product: Product) {
+
+        this._productsInCart.update(products => [product, ...products])
+    }
+
+    public deleteProductFromCart(productId: number) {
+
+        this._productsInCart.update(products => products.filter(product => product.id !== productId))
     }
 }

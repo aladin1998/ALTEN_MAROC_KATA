@@ -2,19 +2,43 @@
 
 <p-button label="Créer produit" (onClick)="onCreate()" class="block text-center"/>
 
-<p-dataView #dv [value]="products()">
+<!-- Filter Section -->
+<div class="p-mb-3">
+    <span class="p-input-icon-left">
+        <input pInputText [(ngModel)]="filterText" (input)="onFilter()" placeholder="Filtrer par nom ou catégorie" />
+    </span>
+</div>
+
+<p-dataView #dv [value]="filteredProducts" [paginator]="true" [rows]="itemsPerPage" [first]="first" (onPage)="onPage($event)">
     <ng-template pTemplate="list" let-products>
         @for (product of products; track product) {
             <p-card class="block mb-2">
-                <span class="font-medium text-secondary text-sm">{{ product.category }}</span>
+                <span class="font-medium text-sm">{{ product.category }}</span>
+
                 <div class="text-lg font-medium text-900 mt-2">{{ product.name }}</div>
+                <p-rating [(ngModel)]="product.rating" [readonly]="true" />
+                    <p class="m-0">
+                        {{ product.description }}
+                    </p>
+
 
                 <ng-template pTemplate="footer">
                     <div class="flex gap-3 mt-1">
                         <p-button label="Modifier" severity="secondary" (onClick)="onUpdate(product)"/>
                         <p-button label="Supprimer" severity="danger" (onClick)="onDelete(product)" />
+                        <p-button label="Ajouter au Panier" [disabled]="product.inventoryStatus === 'OUTOFSTOCK'" class="flex-auto md:flex-initial whitespace-nowrap" icon="pi pi-shopping-cart" severity="danger" (onClick)="onAddToCart(product)" />
+                        <p-button label="Supprimer depuis le Panier" severity="danger" (onClick)="onDeleteFromCart(product)" />
+
                     </div>
                 </ng-template>
+
+                <div class="box">
+                    <div class="push"> <span class="text-xl font-semibold">{{
+                        product.price | currency
+                    }}</span>
+
+                    </div>
+                </div>
             </p-card>
         }
     </ng-template>
